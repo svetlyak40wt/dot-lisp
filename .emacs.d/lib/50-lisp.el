@@ -7,8 +7,12 @@
   ;;  (load (expand-file-name "~/quicklisp/slime-helper.el")))
   ;; (t (require-or-install 'slime))
   )
+
 (if (file-exists-p (expand-file-name "~/projects/lisp/sly"))
     (add-to-list 'load-path (expand-file-name "~/projects/lisp/sly")))
+
+(if (file-exists-p (expand-file-name "~/projects/lisp/lispy"))
+    (add-to-list 'load-path (expand-file-name "~/projects/lisp/lispy")))
 
 ;;(require 'slime-autoloads)
 (require 'hideshow)
@@ -161,7 +165,10 @@
           (lambda ()
             (lispy-mode 1)
             (setq-local lispy-use-sly t)
-
+            ;; Запрещаем добавлять пробел после двоеточия в любых случаях
+            (setq-local lispy-colon-no-space-regex
+                        '((lisp-mode . ".*")))
+            
             ;; При копировании символа в :import-from, заменяем
             ;; точки на слёши
             (setq sly-import-symbol-package-transform-function
@@ -194,6 +201,60 @@
 (defun 40wt-switch-to-ielm-buffer ()
   (interactive)
   (switch-to-buffer "*ielm*"))
+
+
+(defun 40wt-init-lisp-repl ()
+  (warn "Loading custom LISP configuration for the REPL")
+  
+  (sly-eval '(cl:progn
+              (cl:ignore-errors (ql:quickload :prove))
+              (cl:ignore-errors (ql:quickload :rove))
+              (cl:ignore-errors (ql:quickload :log4slime))))
+
+  (let ((log4slime-exists (sly-eval '(cl:when (cl:find-package :log4slime)
+                                      t)))
+        (prove-exists (sly-eval '(cl:when (cl:find-package :prove)
+                                  t)))
+        (rove-exists (sly-eval '(cl:when (cl:find-package :rove)
+                                 t))))
+    (unless prove-exists
+      (warn "Package prove was not found."))
+    (unless rove-exists
+      (warn "Package rove was not found."))
+    (unless log4slime-exists
+      (warn "Package log4slime was not found."))
+  
+    (when prove-exists
+      ;; что-то в емаксе не показываются нормально цвета
+      (sly-eval '(cl:setf prove:*enable-colors* nil
+                  ;; и я хочу чтобы выскакивал дебаггер на каждую ошибку
+                  prove:*debug-on-error* t)))
+
+    ;; Я хочу чтобы выскакивал дебаггер на каждую ошибку,
+    ;; но иногда rove может быть недоступна
+    (when rove-exists
+      (sly-eval '(cl:setf rove:*debug-on-error* t)))
+  
+    (when log4slime-exists
+      (let ((log4slime-el (sly-eval '(cl:format nil
+                                      "~Alog4slime-setup.el"
+                                      log4slime:*QUICKLISP-DIRECTORY*))))
+        (unless (file-exists-p log4slime-el)
+          (sly-eval '(log4slime:install)))
+
+        ;; Если файла всё ещё нет, возможно мы запустили install на удалённой машине
+
+        (cond
+          ((file-exists-p log4slime-el)
+           (load log4slime-el)
+           (global-log4slime-mode 1))
+          (t (warn "Unable to load emacs part of the Log4Slime. Seems you are connecting to remote Lisp.")))))))
+
+
+(add-hook 'sly-mrepl-mode-hook
+          '40wt-init-lisp-repl
+          ;; append
+          t)
 
 
 (add-hook 'emacs-lisp-mode-hook
