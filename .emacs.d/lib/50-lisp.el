@@ -18,6 +18,13 @@
 (require 'hideshow)
 (require-or-install 'lispy)
 
+
+(setq sly-default-lisp 'ccl)
+(setq sly-lisp-implementations
+      `((sbcl ("ros" "-L" "sbcl-bin" "-Q" "run") :coding-system utf-8-unix)
+        (ccl ("ros" "-L" "ccl-bin" "-Q" "run") :coding-system utf-8-unix)))
+
+
 ;; snippets
 ;; (require-or-install 'yasnippet)
 ;; (require-or-install 'common-lisp-snippets)
@@ -206,10 +213,10 @@
 (defun 40wt-init-lisp-repl ()
   (warn "Loading custom LISP configuration for the REPL")
   
-  (sly-eval '(cl:progn
-              (cl:ignore-errors (ql:quickload :prove))
-              (cl:ignore-errors (ql:quickload :rove))
-              (cl:ignore-errors (ql:quickload :log4slime))))
+  ;; (sly-eval '(cl:progn
+  ;;             (cl:ignore-errors (ql:quickload :prove))
+  ;;             (cl:ignore-errors (ql:quickload :rove))
+  ;;             (cl:ignore-errors (ql:quickload :log4slime))))
 
   (let ((log4slime-exists (sly-eval '(cl:when (cl:find-package :log4slime)
                                       t)))
