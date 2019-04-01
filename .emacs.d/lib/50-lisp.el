@@ -19,10 +19,26 @@
 (require-or-install 'lispy)
 
 
-(setq sly-default-lisp 'ccl)
+(setq sly-contribs '(sly-fancy
+                     ;; sly-named-readtables
+                     ;; sly-package-inferred
+                     ))
+;; (add-to-list 'load-path "~/projects/lisp/sly-package-inferred")
+;; (require 'sly-package-inferred-autoloads)
+
+;; (add-to-list 'load-path "~/projects/lisp/sly-log4cl")
+;; (require 'sly-log4cl-autoloads)
+
+;; (add-to-list 'load-path "~/projects/lisp/sly-named-readtables")
+;; ;; это почему-то не работает
+;; ;; (require 'sly-named-readtables-autoloads)
+;; (add-to-list 'sly-contribs 'sly-named-readtables 'append)
+
+(setq sly-default-lisp 'ccl-bin)
 (setq sly-lisp-implementations
-      `((sbcl ("ros" "-L" "sbcl-bin" "-Q" "run") :coding-system utf-8-unix)
-        (ccl ("ros" "-L" "ccl-bin" "-Q" "run") :coding-system utf-8-unix)))
+      `((sbcl ("ros" "-L" "sbcl" "-Q" "run") :coding-system utf-8-unix)
+        (sbcl-bin ("ros" "-L" "sbcl-bin" "-Q" "run") :coding-system utf-8-unix)
+        (ccl-bin ("ros" "-L" "ccl-bin" "-Q" "run") :coding-system utf-8-unix)))
 
 
 ;; snippets
@@ -127,6 +143,7 @@
 (add-hook 'sly-mode-hook
           '(lambda ()
             (message "REDefining sly-mrepl-sync from my settings")
+            (company-mode)
             (define-key sly-mode-map (kbd "C-c ~") '40ants-mrepl-sync)
             (define-key sly-mode-map (kbd "C-c u") 'sly-unintern-symbol)))
 
@@ -218,8 +235,8 @@
   ;;             (cl:ignore-errors (ql:quickload :rove))
   ;;             (cl:ignore-errors (ql:quickload :log4slime))))
 
-  (let ((log4slime-exists (sly-eval '(cl:when (cl:find-package :log4slime)
-                                      t)))
+  (let (;; (log4slime-exists (sly-eval '(cl:when (cl:find-package :log4slime)
+        ;;                               t)))
         (prove-exists (sly-eval '(cl:when (cl:find-package :prove)
                                   t)))
         (rove-exists (sly-eval '(cl:when (cl:find-package :rove)
@@ -228,8 +245,8 @@
       (warn "Package prove was not found."))
     (unless rove-exists
       (warn "Package rove was not found."))
-    (unless log4slime-exists
-      (warn "Package log4slime was not found."))
+    ;; (unless log4slime-exists
+    ;;   (warn "Package log4slime was not found."))
   
     (when prove-exists
       ;; что-то в емаксе не показываются нормально цвета
@@ -242,20 +259,21 @@
     (when rove-exists
       (sly-eval '(cl:setf rove:*debug-on-error* t)))
   
-    (when log4slime-exists
-      (let ((log4slime-el (sly-eval '(cl:format nil
-                                      "~Alog4slime-setup.el"
-                                      log4slime:*QUICKLISP-DIRECTORY*))))
-        (unless (file-exists-p log4slime-el)
-          (sly-eval '(log4slime:install)))
+    ;; (when log4slime-exists
+    ;;   (let ((log4slime-el (sly-eval '(cl:format nil
+    ;;                                   "~Alog4slime-setup.el"
+    ;;                                   log4slime:*QUICKLISP-DIRECTORY*))))
+    ;;     (unless (file-exists-p log4slime-el)
+    ;;       (sly-eval '(log4slime:install)))
 
-        ;; Если файла всё ещё нет, возможно мы запустили install на удалённой машине
+    ;;     ;; Если файла всё ещё нет, возможно мы запустили install на удалённой машине
 
-        (cond
-          ((file-exists-p log4slime-el)
-           (load log4slime-el)
-           (global-log4slime-mode 1))
-          (t (warn "Unable to load emacs part of the Log4Slime. Seems you are connecting to remote Lisp.")))))))
+    ;;     (cond
+    ;;       ((file-exists-p log4slime-el)
+    ;;        (load log4slime-el)
+    ;;        (global-log4slime-mode 1))
+    ;;       (t (warn "Unable to load emacs part of the Log4Slime. Seems you are connecting to remote Lisp.")))))
+    ))
 
 
 (add-hook 'sly-mrepl-mode-hook
