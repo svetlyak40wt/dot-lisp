@@ -39,8 +39,6 @@
       `((sbcl ("ros" "-L" "sbcl" "-Q" "run") :coding-system utf-8-unix)
         (sbcl-bin ("ros" "-L" "sbcl-bin" "-Q" "run") :coding-system utf-8-unix)
         (ccl-bin ("ros" "-L" "ccl-bin" "-Q" "run") :coding-system utf-8-unix)))
-
-
 ;; snippets
 ;; (require-or-install 'yasnippet)
 ;; (require-or-install 'common-lisp-snippets)
