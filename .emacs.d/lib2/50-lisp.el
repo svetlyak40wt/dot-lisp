@@ -27,8 +27,11 @@
  sly
  :hook (lisp-mode . sly-editing-mode)
  :bind
- (("C-c ~" . 40ants-mrepl-sync)
-  ("C-c u" . sly-unintern-symbol))
+ (:map sly-mode-map
+       ("C-c ~" . 40ants-mrepl-sync)
+       ("C-c v" . 40ants-mrepl-sync)
+       ("C-o r" . sly-mrepl)
+       ("C-c u" . sly-unintern-symbol))
  :config
  (setq sly-default-lisp 'sbcl)
  (setq sly-lisp-implementations

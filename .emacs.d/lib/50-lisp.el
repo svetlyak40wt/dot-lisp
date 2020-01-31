@@ -14,6 +14,10 @@
 (if (file-exists-p (expand-file-name "~/projects/lisp/lispy"))
     (add-to-list 'load-path (expand-file-name "~/projects/lisp/lispy")))
 
+(when (file-exists-p (expand-file-name "~/projects/lisp/log4sly/elisp"))
+  (add-to-list 'load-path (expand-file-name "~/projects/lisp/log4sly/elisp"))
+  (require 'log4sly))
+
 ;;(require 'slime-autoloads)
 (require 'hideshow)
 (require-or-install 'lispy)
@@ -225,26 +229,47 @@
   (switch-to-buffer "*ielm*"))
 
 
+(defun 40ants-init-log4sly ()
+  (cond
+    ;; Файл с кодом для Emacs может уже быть загружен ранее
+    ((boundp 'global-log4sly-mode)
+     (global-log4sly-mode 1))
+    ;; А если нет, то тогда его надо загрузить
+    (let ((log4sly-el (sly-eval '(cl:format nil
+                                  "~Alog4sly-setup.el"
+                                  log4sly:*QUICKLISP-DIRECTORY*))))
+      (unless (file-exists-p log4sly-el)
+        (sly-eval '(log4sly:install)))
+
+      ;; Если файла всё ещё нет, возможно мы запустили install на удалённой машине
+
+      (cond
+        ((file-exists-p log4sly-el)
+         (load log4sly-el)
+         (global-log4sly-mode 1))
+        (t (warn "Unable to load emacs part of the Log4Sly. Seems you are connecting to remote Lisp."))))))
+
+
 (defun 40wt-init-lisp-repl ()
   (warn "Loading custom LISP configuration for the REPL")
   
-  ;; (sly-eval '(cl:progn
-  ;;             (cl:ignore-errors (ql:quickload :prove))
-  ;;             (cl:ignore-errors (ql:quickload :rove))
-  ;;             (cl:ignore-errors (ql:quickload :log4slime))))
+  (sly-eval '(cl:progn
+              ;; (cl:ignore-errors (ql:quickload :prove))
+              ;; (cl:ignore-errors (ql:quickload :rove))
+              (cl:ignore-errors (ql:quickload :log4sly))))
 
-  (let (;; (log4slime-exists (sly-eval '(cl:when (cl:find-package :log4slime)
-        ;;                               t)))
+  (let ((log4sly-exists (sly-eval '(cl:when (cl:find-package :log4sly)
+                                    t)))
         (prove-exists (sly-eval '(cl:when (cl:find-package :prove)
                                   t)))
         (rove-exists (sly-eval '(cl:when (cl:find-package :rove)
                                  t))))
     (unless prove-exists
-      (warn "Package prove was not found."))
+      (warn "CL package prove was not found."))
     (unless rove-exists
-      (warn "Package rove was not found."))
-    ;; (unless log4slime-exists
-    ;;   (warn "Package log4slime was not found."))
+      (warn "CL package rove was not found."))
+    (unless log4sly-exists
+      (warn "CL package log4sly was not found."))
   
     (when prove-exists
       ;; что-то в емаксе не показываются нормально цвета
@@ -257,21 +282,8 @@
     (when rove-exists
       (sly-eval '(cl:setf rove:*debug-on-error* t)))
   
-    ;; (when log4slime-exists
-    ;;   (let ((log4slime-el (sly-eval '(cl:format nil
-    ;;                                   "~Alog4slime-setup.el"
-    ;;                                   log4slime:*QUICKLISP-DIRECTORY*))))
-    ;;     (unless (file-exists-p log4slime-el)
-    ;;       (sly-eval '(log4slime:install)))
-
-    ;;     ;; Если файла всё ещё нет, возможно мы запустили install на удалённой машине
-
-    ;;     (cond
-    ;;       ((file-exists-p log4slime-el)
-    ;;        (load log4slime-el)
-    ;;        (global-log4slime-mode 1))
-    ;;       (t (warn "Unable to load emacs part of the Log4Slime. Seems you are connecting to remote Lisp.")))))
-    ))
+    (when log4sly-exists
+      (40ants-init-log4sly))))
 
 
 (add-hook 'sly-mrepl-mode-hook
