@@ -29,6 +29,7 @@
  ;; :defer nil
  :bind
  (:map sly-mode-map
+  ("C-c ~" . 40ants-mrepl-sync)
   ("C-c v" . 40ants-mrepl-sync)
   ("C-c u" . sly-unintern-symbol)
   ("C-o r" . sly-mrepl))
