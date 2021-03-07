@@ -4,7 +4,6 @@
 (if (file-exists-p (expand-file-name "~/projects/lisp/lispy"))
     (add-to-list 'load-path (expand-file-name "~/projects/lisp/lispy")))
 
-
 ;;(require 'hideshow)
 
 ;;(use-package lispy)
@@ -16,30 +15,63 @@
  ;; и SLY не жаловался на него каждый раз когда делаешь M-x sly
  :config (setq lisp-mode-hook nil))           
 
-
 (defun 40ants-mrepl-sync ()
   (interactive)
   (sly-mrepl-sync (sly-current-package)
                   ;; don't change directory
                   nil))
 
+(use-package sly-named-readtables)
+
+(use-package sly-macrostep)
+
+;; https://github.com/fisxoj/sly-docker
+(when (file-exists-p (expand-file-name "~/projects/lisp/sly-docker"))
+  (add-to-list 'load-path (expand-file-name "~/projects/lisp/sly-docker"))
+  (use-package docker-tramp)
+  (require 'sly-docker)
+  (with-eval-after-load 'sly
+    (add-to-list 'sly-contribs 'sly-docker 'append)))
+
+
+;; https://github.com/PuercoPop/sly-repl-ansi-color
+(use-package sly-repl-ansi-color
+  :config
+  (with-eval-after-load 'sly
+    (add-to-list 'sly-contribs 'sly-repl-ansi-color 'append)))
+
 (use-package
- sly
- :hook (lisp-mode . sly-editing-mode)
- ;; :defer nil
- :bind
- (:map sly-mode-map
-  ("C-c ~" . 40ants-mrepl-sync)
-  ("C-c v" . 40ants-mrepl-sync)
-  ("C-c u" . sly-unintern-symbol)
-  ("C-o r" . sly-mrepl))
- :config
- (message "Configuring SLY") 
- (setq sly-default-lisp 'sbcl)
- (setq sly-lisp-implementations
-       `((sbcl ("ros" "-L" "sbcl" "-Q" "run") :coding-system utf-8-unix)
-         (sbcl-bin ("ros" "-L" "sbcl-bin" "-Q" "run") :coding-system utf-8-unix)
-         (ccl-bin ("ros" "-L" "ccl-bin" "-Q" "run") :coding-system utf-8-unix))))
+    sly
+    :hook (lisp-mode . sly-editing-mode)
+    ;; :defer nil
+    :bind
+    (:map sly-mode-map
+          ("C-c ~" . 40ants-mrepl-sync)
+          ("C-c v" . 40ants-mrepl-sync)
+          ("C-c u" . sly-unintern-symbol)
+          ("C-o r" . sly-mrepl))
+    :config
+    (message "Configuring SLY")
+
+    (setq sly-default-lisp 'sbcl)
+
+    ;; ros binary is here
+    (pushnew "~/.local/bin" exec-path :test #'equal)
+
+    (setq sly-lisp-implementations
+          `((sbcl ("ros" "-L" "sbcl"
+                         "--load" "~/.sbclrc"
+                         ;; To load local version of quicklisp
+                         ;; instead of provided by Roswell:
+                         "--eval" "(ql:quickload :quicklisp :silent t)"
+                         "-Q" "run")
+                  :coding-system utf-8-unix)
+            (sbcl-bin ("ros" "-L" "sbcl-bin"
+                             "--load" "~/.sbclrc"
+                             "--eval" "(ql:quickload :quicklisp :silent t)"
+                             "-Q" "run")
+                      :coding-system utf-8-unix)
+            (ccl-bin ("ros" "-L" "ccl-bin" "-Q" "run") :coding-system utf-8-unix))))
 
 
 (defun 40wt-join-line ()
