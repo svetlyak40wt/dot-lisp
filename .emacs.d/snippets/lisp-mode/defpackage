@@ -2,6 +2,6 @@
 # name: defpackage
 # key: defp
 # --
-(defpackage #:${1:name}
+(uiop:define-package #:${1:name}
    (:use #:cl))
-(in-package ${2:$1})
+(in-package #:${2:$1})
