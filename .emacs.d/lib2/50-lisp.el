@@ -1,19 +1,26 @@
-(if (file-exists-p (expand-file-name "~/projects/lisp/sly"))
-    (add-to-list 'load-path (expand-file-name "~/projects/lisp/sly")))
+(when (file-exists-p (expand-file-name "~/.roswell/lisp/slime/master"))
+  (add-to-list 'load-path (expand-file-name "~/.roswell/lisp/slime/master")))
 
-(if (file-exists-p (expand-file-name "~/projects/lisp/lispy"))
-    (add-to-list 'load-path (expand-file-name "~/projects/lisp/lispy")))
+;; This block should go before we add a path to the SLY,
+;; because otherwise SLY will check in it's autoload file if there is
+;; SLIME in a lisp-mode-hook and will promt if we want to remove it
+;; each time Emacs is loaded.
+(use-package slime
+    :config
+  (message "Configuring SLIME")
+  (remove-hook 'lisp-mode-hook 'slime-lisp-mode-hook))
 
-;;(require 'hideshow)
 
-;;(use-package lispy)
+(when (file-exists-p (expand-file-name "~/projects/lisp/sly"))
+  (add-to-list 'load-path (expand-file-name "~/projects/lisp/sly")))
 
+(when (file-exists-p (expand-file-name "~/projects/lisp/lispy"))
+  (add-to-list 'load-path (expand-file-name "~/projects/lisp/lispy")))
 
-(use-package
- slime
- ;; Делаем так, чтобы SLIME не добавлял свой хук,
- ;; и SLY не жаловался на него каждый раз когда делаешь M-x sly
- :config (setq lisp-mode-hook nil))           
+(when (file-exists-p (expand-file-name "~/projects/lisp/log4sly/elisp")) ;
+  (add-to-list 'load-path (expand-file-name "~/projects/lisp/log4sly/elisp"))
+  (require 'log4sly))
+
 
 (defun 40ants-mrepl-sync ()
   (interactive)
@@ -25,35 +32,38 @@
 
 (use-package sly-macrostep)
 
-;; https://github.com/fisxoj/sly-docker
-(when (file-exists-p (expand-file-name "~/projects/lisp/sly-docker"))
-  (add-to-list 'load-path (expand-file-name "~/projects/lisp/sly-docker"))
-  (use-package docker-tramp)
-  (require 'sly-docker)
-  (with-eval-after-load 'sly
-    (add-to-list 'sly-contribs 'sly-docker 'append)))
-
-
 ;; https://github.com/PuercoPop/sly-repl-ansi-color
 (use-package sly-repl-ansi-color
   :config
   (with-eval-after-load 'sly
     (add-to-list 'sly-contribs 'sly-repl-ansi-color 'append)))
 
+;; https://github.com/fisxoj/sly-docker
+(when (file-exists-p (expand-file-name "~/projects/lisp/sly-docker"))
+  (use-package docker-tramp)
+  (add-to-list 'load-path (expand-file-name "~/projects/lisp/sly-docker"))
+  (add-to-list 'sly-contribs 'sly-docker 'append))
+
+(when (file-exists-p (expand-file-name "~/projects/lisp/sly-package-inferred"))
+  (add-to-list 'load-path (expand-file-name "~/projects/lisp/sly-package-inferred"))
+  (require 'sly-package-inferred))
+
 (use-package
     sly
-    :hook (lisp-mode . sly-editing-mode)
+    :hook ((lisp-mode . sly-editing-mode)
+           (lisp-mode . log4sly-mode))
     ;; :defer nil
     :bind
     (:map sly-mode-map
           ("C-c ~" . 40ants-mrepl-sync)
           ("C-c v" . 40ants-mrepl-sync)
+          ("C-c k" . sly-import-package-at-point)
           ("C-c u" . sly-unintern-symbol)
           ("C-o r" . sly-mrepl))
     :config
     (message "Configuring SLY")
 
-    (setq sly-default-lisp 'sbcl)
+    (setq sly-default-lisp 'sbcl-bin)
 
     ;; ros binary is here
     (pushnew "~/.local/bin" exec-path :test #'equal)
