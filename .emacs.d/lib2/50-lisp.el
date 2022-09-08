@@ -44,9 +44,11 @@
   (add-to-list 'load-path (expand-file-name "~/projects/lisp/sly-docker"))
   (add-to-list 'sly-contribs 'sly-docker 'append))
 
-(when (file-exists-p (expand-file-name "~/projects/lisp/sly-package-inferred"))
-  (add-to-list 'load-path (expand-file-name "~/projects/lisp/sly-package-inferred"))
-  (require 'sly-package-inferred))
+;; TODO: надо разобраться, как теперь правильно сотировать autocomplete
+;;
+;; (when (file-exists-p (expand-file-name "~/projects/lisp/sly-package-inferred"))
+;;   (add-to-list 'load-path (expand-file-name "~/projects/lisp/sly-package-inferred"))
+;;   (require 'sly-package-inferred))
 
 (use-package
     sly
