@@ -1,0 +1,4 @@
+;; To support backslashes in the projects names.
+;; Zach reverted my pull https://github.com/quicklisp/quicklisp-client/pull/206/files
+;; in commit https://github.com/quicklisp/quicklisp-client/commit/4727689c6fcde89149a8a6c5496662cde939a727
+;; (push "~/projects/lisp/quicklisp-client/quicklisp/" asdf:*central-registry*)
