@@ -1,3 +1,5 @@
+(require 'cl-lib)
+
 (when (file-exists-p (expand-file-name "~/.roswell/lisp/slime/master"))
   (add-to-list 'load-path (expand-file-name "~/.roswell/lisp/slime/master")))
 
@@ -68,21 +70,21 @@
     (setq sly-default-lisp 'sbcl-bin)
 
     ;; ros binary is here
-    (pushnew "~/.local/bin" exec-path :test #'equal)
+    (cl-pushnew "~/.local/bin" exec-path :test #'equal)
 
     (setq sly-lisp-implementations
-          `((sbcl ("ros" "-L" "sbcl"
+          `((sbcl-bin ("ros" "-L" "sbcl-bin"
+                             "--load" "~/.sbclrc"
+                             "--eval" "(ql:quickload :quicklisp :silent t)"
+                             "-Q" "run")
+                      :coding-system utf-8-unix)
+            (sbcl ("ros" "-L" "sbcl"
                          "--load" "~/.sbclrc"
                          ;; To load local version of quicklisp
                          ;; instead of provided by Roswell:
                          "--eval" "(ql:quickload :quicklisp :silent t)"
                          "-Q" "run")
                   :coding-system utf-8-unix)
-            (sbcl-bin ("ros" "-L" "sbcl-bin"
-                             "--load" "~/.sbclrc"
-                             "--eval" "(ql:quickload :quicklisp :silent t)"
-                             "-Q" "run")
-                      :coding-system utf-8-unix)
             (ccl-bin ("ros" "-L" "ccl-bin" "-Q" "run") :coding-system utf-8-unix))))
 
 
