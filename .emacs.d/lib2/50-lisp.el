@@ -13,6 +13,9 @@
   (remove-hook 'lisp-mode-hook 'slime-lisp-mode-hook))
 
 
+(when (file-exists-p (expand-file-name "~/projects/sly"))
+  (add-to-list 'load-path (expand-file-name "~/projects/sly")))
+
 (when (file-exists-p (expand-file-name "~/projects/lisp/sly"))
   (add-to-list 'load-path (expand-file-name "~/projects/lisp/sly")))
 
@@ -52,40 +55,57 @@
 ;;   (add-to-list 'load-path (expand-file-name "~/projects/lisp/sly-package-inferred"))
 ;;   (require 'sly-package-inferred))
 
+;; A trick from https://www.n16f.net/blog/slime-compilation-tips/
+(defun g-sly-maybe-show-compilation-log (success notes buffer loadp)
+  (cond
+   (success
+    (let ((name (sly-buffer-name :compilation)))
+        (when (get-buffer name)
+          (kill-buffer name))))
+   (t
+    (sly-maybe-show-compilation-log success notes buffer loadp))))
+
+
 (use-package
-    sly
-    :hook ((lisp-mode . sly-editing-mode)
-           (lisp-mode . log4sly-mode))
-    ;; :defer nil
-    :bind
-    (:map sly-mode-map
-          ("C-c ~" . 40ants-mrepl-sync)
-          ("C-c v" . 40ants-mrepl-sync)
-          ("C-c k" . sly-import-package-at-point)
-          ("C-c u" . sly-unintern-symbol)
-          ("C-o r" . sly-mrepl))
-    :config
-    (message "Configuring SLY")
+  sly
+  :hook ((lisp-mode . sly-editing-mode)
+         (lisp-mode . log4sly-mode))
+  ;; :defer nil
+  :bind
+  (:map sly-mode-map
+        ("C-c ~" . 40ants-mrepl-sync)
+        ("C-c v" . 40ants-mrepl-sync)
+        ("C-c k" . sly-import-package-at-point)
+        ("C-c u" . sly-unintern-symbol)
+        ("C-o r" . sly-mrepl))
+  :config
+  (message "Configuring SLY")
 
-    (setq sly-default-lisp 'sbcl-bin)
+  (setq sly-default-lisp 'sbcl-bin)
 
-    ;; ros binary is here
-    (cl-pushnew "~/.local/bin" exec-path :test #'equal)
+  ;; ros binary is here
+  (cl-pushnew "~/.local/bin" exec-path :test #'equal)
 
-    (setq sly-lisp-implementations
-          `((sbcl-bin ("ros" "-L" "sbcl-bin"
-                             "--load" "~/.sbclrc"
-                             "--eval" "(ql:quickload :quicklisp :silent t)"
-                             "-Q" "run")
-                      :coding-system utf-8-unix)
-            (sbcl ("ros" "-L" "sbcl"
-                         "--load" "~/.sbclrc"
-                         ;; To load local version of quicklisp
-                         ;; instead of provided by Roswell:
-                         "--eval" "(ql:quickload :quicklisp :silent t)"
-                         "-Q" "run")
-                  :coding-system utf-8-unix)
-            (ccl-bin ("ros" "-L" "ccl-bin" "-Q" "run") :coding-system utf-8-unix))))
+  ;; Here we replace original hook with the new one:
+(remove-hook 'sly-compilation-finished-hook
+             'sly-maybe-show-compilation-log)
+(add-hook 'sly-compilation-finished-hook
+          'g-sly-maybe-show-compilation-log)
+
+  (setq sly-lisp-implementations
+        `((sbcl-bin ("ros" "-L" "sbcl-bin"
+                     "--load" "~/.sbclrc"
+                     "--eval" "(ql:quickload :quicklisp :silent t)"
+                     "-Q" "run")
+                    :coding-system utf-8-unix)
+          (sbcl ("ros" "-L" "sbcl"
+                 "--load" "~/.sbclrc"
+                 ;; To load local version of quicklisp
+                 ;; instead of provided by Roswell:
+                 "--eval" "(ql:quickload :quicklisp :silent t)"
+                 "-Q" "run")
+                :coding-system utf-8-unix)
+          (ccl-bin ("ros" "-L" "ccl-bin" "-Q" "run") :coding-system utf-8-unix))))
 
 
 (defun 40wt-join-line ()
