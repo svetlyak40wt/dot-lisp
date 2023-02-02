@@ -59,6 +59,7 @@
     (:map sly-mode-map
           ("C-c ~" . 40ants-mrepl-sync)
           ("C-c v" . 40ants-mrepl-sync)
+          ;; Потерял где-то эту функцию. Потратил пару часов, пытаясь найти но ни у себя, ни в интернете не откопал
           ("C-c k" . sly-import-package-at-point)
           ("C-c u" . sly-unintern-symbol)
           ("C-o r" . sly-mrepl))
@@ -136,6 +137,43 @@
  ;;                                   package)))
  )
 
-(use-package
- company
- :hook (lisp-mode . company-mode))
+;; Previously I've used this completion, but in 2023 switched to Corfu
+;; (use-package
+;;  company
+;;  :hook (lisp-mode . company-mode))
+
+
+;; Source from
+;; https://github.com/Gavinok/emacs.d/blob/588dd0cb88534c2f9455d83d9dc5468925200c3f/init.el#L564
+(use-package corfu
+  ;; Optional customizations
+  :custom
+  (corfu-cycle t)                 ; Allows cycling through candidates
+  (corfu-auto t)                  ; Enable auto completion
+  (corfu-auto-prefix 2)
+  (corfu-auto-delay 0.0)
+  (corfu-popupinfo-delay '(0.5 . 0.2))
+  (corfu-preview-current 'insert) ; Do not preview current candidate
+  (corfu-preselect-first nil)
+  (corfu-on-exact-match nil)      ; Don't auto expand tempel snippets
+
+  ;; Optionally use TAB for cycling, default is `corfu-complete'.
+  :bind (:map corfu-map
+              ("M-SPC"      . corfu-insert-separator)
+              ("TAB"        . corfu-next)
+              ([tab]        . corfu-next)
+              ("S-TAB"      . corfu-previous)
+              ([backtab]    . corfu-previous)
+              ("S-<return>" . corfu-insert)
+              ("RET"        . nil))
+
+  :init
+  (global-corfu-mode)
+  (corfu-history-mode)
+  (corfu-popupinfo-mode) ; Popup completion info
+  :config
+  (add-hook 'eshell-mode-hook
+            (lambda () (setq-local corfu-quit-at-boundary t
+                              corfu-quit-no-match t
+                              corfu-auto nil)
+              (corfu-mode))))
