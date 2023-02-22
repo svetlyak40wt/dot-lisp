@@ -176,7 +176,7 @@
   (corfu-auto-delay 0.0)
   (corfu-popupinfo-delay '(0.5 . 0.2))
   (corfu-preview-current 'insert) ; Do not preview current candidate
-  (corfu-preselect-first nil)
+  (corfu-preselect-first t)
   (corfu-on-exact-match nil)      ; Don't auto expand tempel snippets
 
   ;; Optionally use TAB for cycling, default is `corfu-complete'.
@@ -187,7 +187,7 @@
               ("S-TAB"      . corfu-previous)
               ([backtab]    . corfu-previous)
               ("S-<return>" . corfu-insert)
-              ("RET"        . nil))
+              ("RET"        . corfu-insert))
 
   :init
   (global-corfu-mode)
