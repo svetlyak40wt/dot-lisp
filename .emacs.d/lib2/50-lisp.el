@@ -69,7 +69,8 @@
 (use-package
   sly
   :hook ((lisp-mode . sly-editing-mode)
-         (lisp-mode . log4sly-mode))
+         ;; (lisp-mode . log4sly-mode)
+         )
   ;; :defer nil
   :bind
   (:map sly-mode-map
@@ -192,6 +193,7 @@
   :init
   (global-corfu-mode)
   (corfu-history-mode)
+  (corfu-echo-mode)
   (corfu-popupinfo-mode) ; Popup completion info
   :config
   (add-hook 'eshell-mode-hook
@@ -199,3 +201,9 @@
                               corfu-quit-no-match t
                               corfu-auto nil)
               (corfu-mode))))
+
+;; To make corfu work
+(use-package corfu-terminal
+  :config
+  (unless (display-graphic-p)
+    (corfu-terminal-mode +1)))
