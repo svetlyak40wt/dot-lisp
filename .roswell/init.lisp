@@ -47,3 +47,6 @@
       ;; If started inside a context (i.e., with `clpm exec` or `clpm bundle exec`),
       ;; activate ASDF integration
       (uiop:symbol-call :clpm-client '#:activate-asdf-integration))))
+
+;; Autoactivates CLPM and bundle if clpmfile was found
+(load-clpm)
