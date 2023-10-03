@@ -2,3 +2,20 @@
 ;; Zach reverted my pull https://github.com/quicklisp/quicklisp-client/pull/206/files
 ;; in commit https://github.com/quicklisp/quicklisp-client/commit/4727689c6fcde89149a8a6c5496662cde939a727
 ;; (push "~/projects/lisp/quicklisp-client/quicklisp/" asdf:*central-registry*)
+
+(in-package :cl-user)
+(require 'asdf)
+
+#-ocicl
+(defun load-ocicl ()
+  (when (probe-file #P"/Users/art/.local/share/ocicl/ocicl-runtime.lisp")
+    (load #P"/Users/art/.local/share/ocicl/ocicl-runtime.lisp"))
+
+
+  (setf (symbol-value (find-symbol "*VERBOSE*"
+                                   "OCICL-RUNTIME"))
+        t)
+  ;; Any systems you install in /Users/art/.local/share/ocicl/
+  ;; will be available globally unless you comment out this line:
+  (asdf:initialize-source-registry
+   '(:source-registry :ignore-inherited-configuration (:tree #P"/Users/art/.local/share/ocicl/"))))
