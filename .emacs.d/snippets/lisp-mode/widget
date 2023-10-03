@@ -1,0 +1,35 @@
+# -*- mode: snippet -*-
+# name: defpackage
+# key: wid
+# --
+(uiop:define-package #:${1:system-name}/${2:widget-name}
+  (:use #:cl)
+  (:import-from #:reblocks/widget
+                #:render
+                #:defwidget)
+  (:import-from #:reblocks/html
+                #:with-html)
+  (:import-from #:reblocks/dependencies
+                #:get-dependencies))
+(in-package #:$1/$2)
+
+
+(defwidget ${3:$2-widget} ()
+  ())
+
+
+(defun make-$3 ()
+  (make-instance '$3
+
+
+(defmethod render ((widget $3))
+  (with-html
+    (:p "Fill me with code")))
+
+
+(defmethod get-dependencies ((widget $3))
+  (list*
+   (reblocks-lass:make-dependency
+     `(.$3
+       :color red))
+   (call-next-method)))
