@@ -53,3 +53,24 @@
 
 ;; Autoactivates CLPM and bundle if clpmfile was found
 ;; (load-clpm)
+
+
+(defun set-process-name (title)
+  (uiop:with-output-file (stream "/proc/self/comm" :if-exists :overwrite)
+    (write-string title
+                  stream)))
+
+(let ((fix-filename (make-pathname :directory '(:absolute :home ".quicklisp-client-fix")
+                                   :name "quicklisp-fix"
+	                           :type "lisp")))
+  (let ((quicklisp-found #+quicklisp t
+			 #-quicklisp nil))
+    (cond
+      ((not quicklisp-found)
+       (format t "Quicklisp is not available, skipping fix loading.~%"))
+      ((probe-file fix-filename)
+       (format t "Loading quicklisp fix.~%")
+       (load fix-filename))
+      (t
+       (format t "Quicklisp fix was not found at ~S.~%" fix-filename)))))
+
