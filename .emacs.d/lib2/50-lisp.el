@@ -147,7 +147,7 @@
  
  (setq lispy-use-sly t)
  
- (setq lisp-indent-function 'common-lisp-indent-function)
+ (setq lisp-indent-function 'sly-common-lisp-indent-function)
  ;; (setq common-lisp-style "sbcl")
  (setq common-lisp-style-default "sbcl")
 
