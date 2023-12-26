@@ -1,6 +1,6 @@
 # -*- mode: snippet -*-
-# name: widget
-# key: wid
+# name: page
+# key: page
 # --
 (uiop:define-package #:${1:system-name}/${2:widget-name}
   (:use #:cl)
@@ -8,13 +8,11 @@
                 #:render
                 #:defwidget)
   (:import-from #:reblocks/html
-                #:with-html)
-  (:import-from #:reblocks/dependencies
-                #:get-dependencies))
+                #:with-html))
 (in-package #:$1/$2)
 
 
-(defwidget ${3:$2-widget} ()
+(defwidget ${3:$2-page} ()
   ())
 
 
@@ -25,11 +23,3 @@
 (defmethod render ((widget $3))
   (with-html
     (:p "Fill me with code")))
-
-
-(defmethod get-dependencies ((widget $3))
-  (list*
-   (reblocks-lass:make-dependency
-     `(.$3
-       :color red))
-   (call-next-method)))
