@@ -66,6 +66,10 @@
     (sly-maybe-show-compilation-log success notes buffer loadp))))
 
 
+(defun 40ants-sly-search-buffer-package ()
+  (string-trim-left (sly-search-buffer-package)
+                    "[:#]+"))
+
 (use-package
   sly
   :hook ((lisp-mode . sly-editing-mode)
@@ -82,6 +86,11 @@
         ("C-o r" . sly-mrepl))
   :config
   (message "Configuring SLY")
+
+  ;; Without this wrapper, for packages having uninterned symbols
+  ;; in the (in-package #:foo-bar), SLY will not show package selection
+  ;; and symbol uninterning will show only Quit message without any changes:
+  (setq sly-find-buffer-package-function '40ants-sly-search-buffer-package)
 
   (setq sly-default-lisp 'sbcl-bin)
 
