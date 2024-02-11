@@ -78,8 +78,13 @@
         ("C-c v" . 40ants-mrepl-sync)
         ;; Потерял где-то эту функцию. Потратил пару часов, пытаясь найти но ни у себя, ни в интернете не откопал
         ("C-c k" . sly-import-package-at-point)
-        ("C-c u" . sly-unintern-symbol)
+        ("C-c u" . sly-unintern-symbol))
+  (:map lisp-mode-map
         ("C-o r" . sly-mrepl))
+  ;; This does reverse to the sly-mrepl as described at
+  ;; https://www.reddit.com/r/Common_Lisp/comments/17g9377/revisiting_stupid_slime_tricks/
+  (:map sly-mrepl-mode-map
+        ("C-o r" . sly-switch-to-most-recent))
   :config
   (message "Configuring SLY")
 
@@ -89,10 +94,10 @@
   (cl-pushnew "~/.local/bin" exec-path :test #'equal)
 
   ;; Here we replace original hook with the new one:
-(remove-hook 'sly-compilation-finished-hook
-             'sly-maybe-show-compilation-log)
-(add-hook 'sly-compilation-finished-hook
-          'g-sly-maybe-show-compilation-log)
+  (remove-hook 'sly-compilation-finished-hook
+               'sly-maybe-show-compilation-log)
+  (add-hook 'sly-compilation-finished-hook
+            'g-sly-maybe-show-compilation-log)
 
   (setq sly-lisp-implementations
         `((sbcl-bin ("ros" "-L" "sbcl-bin"
