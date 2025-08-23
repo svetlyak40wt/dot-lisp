@@ -67,8 +67,9 @@
 
 
 (defun 40ants-sly-search-buffer-package ()
-  (string-trim-left (sly-search-buffer-package)
-                    "[:#]+"))
+  (let ((name (sly-search-buffer-package)))
+     (when name (string-trim-left name
+                    "[:#]+"))))
 
 (use-package
   sly
@@ -149,7 +150,7 @@
  
  (setq lisp-indent-function 'sly-common-lisp-indent-function)
  ;; (setq common-lisp-style "sbcl")
- (setq common-lisp-style-default "sbcl")
+ (setq common-lisp-style-default "classic")
 
  ;; Чтобы внутри loop макросы некоторые элементы были с небольшим
  ;; отступом и была видна структура
@@ -183,7 +184,7 @@
   (corfu-cycle t)                 ; Allows cycling through candidates
   (corfu-auto t)                  ; Enable auto completion
   (corfu-auto-prefix 2)
-  (corfu-auto-delay 0.5)
+  (corfu-auto-delay 3.0)
   (corfu-popupinfo-delay '(0.5 . 0.2))
   (corfu-preview-current 'insert) ; Do not preview current candidate
   (corfu-preselect-first t)
@@ -206,9 +207,10 @@
   (corfu-popupinfo-mode) ; Popup completion info
   :config
   (add-hook 'eshell-mode-hook
-            (lambda () (setq-local corfu-quit-at-boundary t
-                              corfu-quit-no-match t
-                              corfu-auto nil)
+            (lambda ()
+              (setq-local corfu-quit-at-boundary t
+                                   corfu-quit-no-match t
+                                   corfu-auto nil)
               (corfu-mode))))
 
 ;; To make corfu work
