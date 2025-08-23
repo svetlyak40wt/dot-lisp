@@ -33,6 +33,33 @@
 
 (require "asdf")
 
+;; (pushnew "~/projects/lisp/cffi/"
+;;            asdf:*central-registry*
+;;            :test 'equal)
+
+;; Unnecessary since PR was merged:
+;; https://github.com/cl-plus-ssl/cl-plus-ssl/pull/180
+;; (when (probe-file "~/projects/lisp/cl-plus-ssl-osx-fix/")
+;;   (pushnew "~/projects/lisp/cl-plus-ssl-osx-fix/"
+;;            asdf:*central-registry*
+;;            :test 'equal)
+;;   (pushnew "~/projects/lisp/40ants-asdf-system/"
+;;            asdf:*central-registry*
+;;            :test 'equal)
+;;   ;; (pushnew "~/projects/lisp/cl-plus-ssl/"
+;;   ;;          asdf:*central-registry*
+;;   ;;          :test 'equal)
+;;   ;; (asdf:load-asd "~/projects/lisp/cl-plus-ssl/cl+ssl.asd")
+
+;;   ;; (asdf:load-system "quicklisp")
+
+;;   ;; (uiop:symbol-call :ql :quickload "cl-plus-ssl-osx-fix")
+
+;;   ;; #+quicklisp
+;;   ;; (ql:quickload "cl-plus-ssl-osx-fix")
+;;   ;; #+asdf
+;;   (asdf:load-system "cl-plus-ssl-osx-fix"))
+
 ;; #-clpm-client
 (defun load-clpm ()
   (when (asdf:find-system "clpm-client" nil)
@@ -50,6 +77,18 @@
       ;; If started inside a context (i.e., with `clpm exec` or `clpm bundle exec`),
       ;; activate ASDF integration
       (uiop:symbol-call :clpm-client '#:activate-asdf-integration))))
+
+
+;;#-ocicl
+;;(when (probe-file #P"/Users/art/.local/share/ocicl/ocicl-runtime.lisp")
+;;  (load #P"/Users/art/.local/share/ocicl/ocicl-runtime.lisp"))
+
+
+;;(setf ocicl-runtime:*verbose* t)
+;; Any systems you install in /Users/art/.local/share/ocicl/
+;; will be available globally unless you comment out this line:
+;;(asdf:initialize-source-registry
+;;  '(:source-registry :ignore-inherited-configuration (:tree #P"/Users/art/.local/share/ocicl/")))
 
 ;; Autoactivates CLPM and bundle if clpmfile was found
 ;; (load-clpm)
