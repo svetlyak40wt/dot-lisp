@@ -165,15 +165,17 @@
   (message "Configuring SLY DONE"))
 
 
+(message "Configuring LISP 8")
+
 (use-package
     sly
     :defer t
     ;; To suppress this warning:
     ;; Warning (emacs): To restore SLIME in this session, customize ‘lisp-mode-hook’ and replace ‘sly-editing-mode’ with ‘slime-lisp-mode-hook’.
     :init (remove-hook 'lisp-mode-hook 'slime-lisp-mode-hook)
-    :hook ((lisp-mode . sly-editing-mode)
+;    :hook ((lisp-mode . sly-editing-mode)
            ;; (lisp-mode . log4sly-mode)
-           )
+;           )
     ;; :defer nil
     :custom
     (sly-replace-slime t)
@@ -187,11 +189,7 @@
           ("C-c k" . sly-import-package-at-point)
           ("C-c u" . sly-unintern-symbol))
     (:map lisp-mode-map
-          ("C-o r" . sly-mrepl))
-    ;; This does reverse to the sly-mrepl as described at
-    ;; https://www.reddit.com/r/Common_Lisp/comments/17g9377/revisiting_stupid_slime_tricks/
-    (:map sly-mrepl-mode-map
-          ("C-o r" . sly-switch-to-most-recent)))
+          ("C-o r" . sly-mrepl)))
 
 
 (defun 40wt-safe-run-with-logging (func &rest args)
@@ -216,6 +214,7 @@
   (interactive)
   (join-line -1))
 
+(message "Configuring LISP 9")
 
 (use-package
  lispy
@@ -268,6 +267,8 @@
 ;;  :hook (lisp-mode . company-mode))
 
 
+(message "Configuring LISP 10")
+
 ;; Source from
 ;; https://github.com/Gavinok/emacs.d/blob/588dd0cb88534c2f9455d83d9dc5468925200c3f/init.el#L564
 (use-package corfu
@@ -306,6 +307,9 @@
                           corfu-auto nil)
               (corfu-mode))))
 
+
+(message "Configuring LISP 11")
+
 ;; To make corfu work
 (use-package corfu-terminal
   :defer t
@@ -313,5 +317,8 @@
   (unless (display-graphic-p)
     (corfu-terminal-mode +1)))
 
+(message "Configuring LISP 12")
 
 (remove-hook 'lisp-mode-hook 'slime-lisp-mode-hook)
+
+(message "Configuring LISP DONE")
