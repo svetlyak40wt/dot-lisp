@@ -1,0 +1,7 @@
+function em {
+  if [[ -d .qlot ]]; then
+      CL_SOURCE_REGISTRY=`pwd`/ qlot exec ros emacs $@
+  else
+      emacs $@
+  fi
+}

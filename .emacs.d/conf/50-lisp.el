@@ -99,9 +99,19 @@
      (sly-maybe-show-compilation-log success notes buffer loadp))))
 
 
+(defun 40ants-sly-search-buffer-package ()
+  (let ((name (sly-search-buffer-package)))
+     (when name (string-trim-left name
+                    "[:#]+"))))
+
+
 (defun 40wt-configure-sly ()
   (message "Configuring SLY")
 
+  ;; Without this wrapper, for packages having uninterned symbols
+  ;; in the (in-package #:foo-bar), SLY will not show package selection
+  ;; and symbol uninterning will show only Quit message without any changes:
+  (setq sly-find-buffer-package-function '40ants-sly-search-buffer-package)
   ;; This style indents LOOP macro clauses
   ;; like this:
   ;;
@@ -177,7 +187,11 @@
           ("C-c k" . sly-import-package-at-point)
           ("C-c u" . sly-unintern-symbol))
     (:map lisp-mode-map
-          ("C-o r" . sly-mrepl)))
+          ("C-o r" . sly-mrepl))
+    ;; This does reverse to the sly-mrepl as described at
+    ;; https://www.reddit.com/r/Common_Lisp/comments/17g9377/revisiting_stupid_slime_tricks/
+    (:map sly-mrepl-mode-map
+          ("C-o r" . sly-switch-to-most-recent)))
 
 
 (defun 40wt-safe-run-with-logging (func &rest args)
@@ -226,9 +240,9 @@
  
  (setq lispy-use-sly t)
  
- (setq lisp-indent-function 'common-lisp-indent-function)
+ (setq lisp-indent-function 'sly-common-lisp-indent-function)
  ;; (setq common-lisp-style "sbcl")
- (setq common-lisp-style-default "sbcl")
+ (setq common-lisp-style-default "classic")
 
  ;; Чтобы внутри loop макросы некоторые элементы были с небольшим
  ;; отступом и была видна структура
@@ -263,7 +277,7 @@
   (corfu-cycle t)                       ; Allows cycling through candidates
   (corfu-auto t)                        ; Enable auto completion
   (corfu-auto-prefix 2)
-  (corfu-auto-delay 0.5)
+  (corfu-auto-delay 3.0)
   (corfu-popupinfo-delay '(0.5 . 0.2))
   (corfu-preview-current 'insert)       ; Do not preview current candidate
   (corfu-preselect-first t)
@@ -286,9 +300,10 @@
   (corfu-popupinfo-mode)                ; Popup completion info
   :config
   (add-hook 'eshell-mode-hook
-            (lambda () (setq-local corfu-quit-at-boundary t
-                                   corfu-quit-no-match t
-                                   corfu-auto nil)
+            (lambda ()
+              (setq-local corfu-quit-at-boundary t
+                          corfu-quit-no-match t
+                          corfu-auto nil)
               (corfu-mode))))
 
 ;; To make corfu work

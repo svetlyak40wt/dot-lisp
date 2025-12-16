@@ -94,6 +94,39 @@
 ;; (load-clpm)
 
 
-
 (push ".qlot" asdf::*default-source-registry-exclusions*)
 (asdf:initialize-source-registry)
+
+
+;; TODO: подумать как бы вызывать эту функцию автоматически когда REPL стартует, но не вызывать, для собранного бинарника
+(defun set-process-name (title)
+  "Use command like this to see the name in the process list:
+
+   ps -eo pid,psr,pcpu,pmem,rss,stat,comm,args
+   or
+   ps -o pid,psr,pcpu,pmem,rss,stat,comm,args -p 316476
+  "
+  (uiop:with-output-file (stream "/proc/self/comm" :if-exists :overwrite)
+    (write-string title
+                  stream)))
+
+
+(handler-bind ((serious-condition
+                (lambda (condition)
+                  (uiop:print-condition-backtrace condition)
+                  (uiop:quit 1))))
+  (let ((fix-filename (merge-pathnames
+                       (make-pathname :directory '(:relative ".quicklisp-client-fix")
+                                      :name "quicklisp-fix"
+                                      :type "lisp")
+                       (user-homedir-pathname))))
+    (let ((quicklisp-found #+quicklisp t
+                           #-quicklisp nil))
+      (cond
+       ((not quicklisp-found)
+        (warn "Quicklisp is not available, skipping fix loading.~%"))
+       ((probe-file fix-filename)
+        (handler-bind ((warning #'muffle-warning))
+          (load fix-filename)))
+       (t
+        (warn "Quicklisp fix was not found at ~S.~%" fix-filename))))))
