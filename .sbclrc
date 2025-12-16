@@ -6,16 +6,22 @@
 (in-package :cl-user)
 (require 'asdf)
 
-#-ocicl
-(defun load-ocicl ()
-  (when (probe-file #P"/Users/art/.local/share/ocicl/ocicl-runtime.lisp")
-    (load #P"/Users/art/.local/share/ocicl/ocicl-runtime.lisp"))
+
+;; Закомментил чтобы проверить, не этот ли код ломает мне поиск библиотек при запуске из под qlot
+;; #-ocicl
+;; (defun load-ocicl ()
+;;   (when (probe-file #P"/Users/art/.local/share/ocicl/ocicl-runtime.lisp")
+;;     (load #P"/Users/art/.local/share/ocicl/ocicl-runtime.lisp"))
 
 
-  (setf (symbol-value (find-symbol "*VERBOSE*"
-                                   "OCICL-RUNTIME"))
-        t)
-  ;; Any systems you install in /Users/art/.local/share/ocicl/
-  ;; will be available globally unless you comment out this line:
-  (asdf:initialize-source-registry
-   '(:source-registry :ignore-inherited-configuration (:tree #P"/Users/art/.local/share/ocicl/"))))
+;;   (setf (symbol-value (find-symbol "*VERBOSE*"
+;;                                    "OCICL-RUNTIME"))
+;;         t)
+;;   ;; Any systems you install in /Users/art/.local/share/ocicl/
+;;   ;; will be available globally unless you comment out this line:
+;;   (asdf:initialize-source-registry
+;;    '(:source-registry :ignore-inherited-configuration (:tree #P"/Users/art/.local/share/ocicl/"))))
+
+
+(push ".qlot" asdf::*default-source-registry-exclusions*)
+(asdf:initialize-source-registry)

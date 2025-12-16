@@ -92,3 +92,8 @@
 
 ;; Autoactivates CLPM and bundle if clpmfile was found
 ;; (load-clpm)
+
+
+
+(push ".qlot" asdf::*default-source-registry-exclusions*)
+(asdf:initialize-source-registry)
