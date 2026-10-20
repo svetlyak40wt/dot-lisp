@@ -15,8 +15,8 @@
 ;;   (remove-hook 'lisp-mode-hook 'slime-lisp-mode-hook))
 
 
-(when (file-exists-p (expand-file-name "~/projects/sly"))
-  (add-to-list 'load-path (expand-file-name "~/projects/sly")))
+(when (file-exists-p (expand-file-name "~/packages/sly"))
+  (add-to-list 'load-path (expand-file-name "~/packages/sly")))
 
 (when (file-exists-p (expand-file-name "~/projects/lisp/sly"))
   (add-to-list 'load-path (expand-file-name "~/projects/lisp/sly")))
@@ -170,6 +170,7 @@
 (use-package
     sly
     :defer t
+    :commands (sly)
     ;; To suppress this warning:
     ;; Warning (emacs): To restore SLIME in this session, customize ‘lisp-mode-hook’ and replace ‘sly-editing-mode’ with ‘slime-lisp-mode-hook’.
     :init (remove-hook 'lisp-mode-hook 'slime-lisp-mode-hook)
